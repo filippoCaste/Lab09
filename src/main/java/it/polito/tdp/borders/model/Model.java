@@ -41,7 +41,7 @@ public class Model {
 		
 //		Graphs.addAllVertices(graph, this.countries);
 		
-		List<Border> borders = new ArrayList<>(dao.getCountryPairs(anno));
+		List<Border> borders = dao.getCountryPairs(anno);
 		//logger.info("Borders {}", borders);
 		
 		for(Border b : borders) {
@@ -66,7 +66,7 @@ public class Model {
 	public List<Country> depthSearch(Country origin) {
 		this.createGraph(2016);
 		if(!this.graph.vertexSet().contains(origin)) {
-			throw new RuntimeException("The graph does not contains this country!");
+			throw new RuntimeException("The graph does not contain this country!");
 		}
 		
 		List<Country> reachables = new ArrayList<>();
@@ -78,6 +78,36 @@ public class Model {
 		}
 		
 		return reachables;
+	}
+	
+	public List<Country> depthSearch_r(Country origin) {
+		this.createGraph(2016);
+		List<Country> reachables = new ArrayList<Country>();
+		List<Border> borders = new ArrayList<>(dao.getCountryPairs(2016));
+		reachables.add(origin);
+		
+		return (this.recursive_search(reachables, borders));		
+	}
+	
+	private List<Country> recursive_search(List<Country> cs, List<Border> bs) {
+		List<Country> btemp = this.getBoundaries(cs.get(cs.size()-1), bs, cs);
+		for(Country cc : btemp) {
+			if(!cs.contains(cc)) {
+				cs.add(cc);
+				this.recursive_search(cs, bs);
+			}
+		}
+		return cs;
+	}
+	
+	public List<Country> getBoundaries(Country c, List<Border> bs, List<Country> partial) {
+		List<Country> res = new ArrayList<>();
+
+		for(Country cc : this.graph.vertexSet()) {
+			if(!partial.contains(cc) && graph.containsEdge(c, cc))
+				res.add(cc);
+		}
+		return res;
 	}
 
 	public List<Country> getCountries() {

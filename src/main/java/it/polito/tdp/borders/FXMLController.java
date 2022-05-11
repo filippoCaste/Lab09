@@ -57,8 +57,8 @@ public class FXMLController {
     void handleSearch(ActionEvent event) {
     	txtResult.clear();
     	Country origin = this.cmbCountry.getValue();
-    	this.txtResult.appendText("Stati raggiungibili a partire da: " + origin);
-    	for(Country c : this.model.depthSearch(origin)) {
+    	this.txtResult.appendText("Stati raggiungibili a partire da: " + origin.getStateNme());
+    	for(Country c : this.model.depthSearch_r(origin)) {
     		txtResult.appendText("\n - " + c);
     	}
     }
