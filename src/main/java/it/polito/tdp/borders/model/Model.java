@@ -1,6 +1,7 @@
 package it.polito.tdp.borders.model;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,11 @@ public class Model {
 		return output;
 	}
 	
+	/**
+	 * Utilizzo degli iteratori della libreria jgrapht per la visita in profondità.
+	 * @param origin
+	 * @return Una lista di nodi raggiungibili a partire da origin
+	 */
 	public List<Country> depthSearch(Country origin) {
 		this.createGraph(2016);
 		if(!this.graph.vertexSet().contains(origin)) {
@@ -80,8 +86,13 @@ public class Model {
 		return reachables;
 	}
 	
-	public List<Country> depthSearch_r(Country origin) {
-		this.createGraph(2016);
+	/**
+	 * Versione ricorsiva della visita in profondità.
+	 * @param origin
+	 * @return una lista di nodi raggiungibili a partire da origin
+	 */
+	public List<Country> depthSearch_r(Country origin, int anno) {
+		this.createGraph(anno);
 		List<Country> reachables = new ArrayList<Country>();
 		List<Border> borders = new ArrayList<>(dao.getCountryPairs(2016));
 		reachables.add(origin);
@@ -100,6 +111,36 @@ public class Model {
 		return cs;
 	}
 	
+	/**
+	 * Versione iterativa della visita in ampiezza.
+	 * @param origin Il Country di partenza
+	 * @param anno L'anno di riferimento per creare il grafo
+	 * @return una List di Country raggiungibili
+	 */
+	public List<Country> breadthSearch_iterative(Country origin, int anno) {
+		this.createGraph(anno);
+		List<Country> toVisit = new ArrayList<>();
+		toVisit.add(origin);
+		
+		List<Country> visited = new ArrayList<>();
+		List<Border> borders = dao.getCountryPairs(anno);
+		
+		for(int i=0; i<toVisit.size(); i++) { // il for( : ) utilizza gli iterator che lanciano la ConcurrentModificationException
+			Country ctemp = toVisit.get(i);
+			toVisit.addAll(toVisit.size(), this.getBoundaries(ctemp, borders, toVisit));
+			visited.add(ctemp);
+			//toVisit.remove(ctemp);
+		}
+		return visited;
+	}
+	
+	/**
+	 * Ritorna tutti i Country adiacenti al Country passato come parametro {@code c}.
+	 * @param c country
+	 * @param bs
+	 * @param partial
+	 * @return una List di Country adiacenti a {@code c}
+	 */
 	public List<Country> getBoundaries(Country c, List<Border> bs, List<Country> partial) {
 		List<Country> res = new ArrayList<>();
 

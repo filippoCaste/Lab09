@@ -56,9 +56,20 @@ public class FXMLController {
     @FXML
     void handleSearch(ActionEvent event) {
     	txtResult.clear();
+    	Integer anno = null;
+    	try {
+    		anno = Integer.parseInt(this.txtAnno.getText());
+    	} catch(NumberFormatException e) {
+    		e.printStackTrace();
+    		txtResult.setText("Inserisci un valore numerico!");
+    		return;
+    	}
+    	if(anno<1816 || anno>2016) {
+    		txtResult.setText("L'anno deve essere compreso tra il 1816 e il 2016!");
+    	}
     	Country origin = this.cmbCountry.getValue();
     	this.txtResult.appendText("Stati raggiungibili a partire da: " + origin.getStateNme());
-    	for(Country c : this.model.depthSearch_r(origin)) {
+    	for(Country c : this.model.breadthSearch_iterative(origin, anno)) {
     		txtResult.appendText("\n - " + c);
     	}
     }
